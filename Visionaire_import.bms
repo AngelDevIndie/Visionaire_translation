@@ -1,0 +1,68 @@
+log MEMORY_FILE3 0 8
+get name basename
+get name2 filename
+string name += .dat
+open FDSE name
+get name basename
+string name += .txt
+open FDSE name 1
+log MEMORY_FILE 0 0
+get asize asize
+set offset1 0
+set end 0
+#BUSCAMOS EL PRIMER ID
+Findloc offset2 String "Id: "
+Math offset2 - 8
+
+goto offset2
+get files long
+for i = 1 to files
+get size long
+getdstring string size
+getdstring dummy 12
+get number long
+for n = 1 to number
+savepos offset2
+get size long
+getdstring string size
+if size > 0 #&& n = 2
+xmath dsize "offset2 - offset1"
+append
+log MEMORY_FILE offset1 dsize
+append
+get msize asize MEMORY_FILE
+goto msize MEMORY_FILE
+getct string string 0x00 1
+get ad short 1
+strlen len string
+math len += 1
+put len long MEMORY_FILE
+putdstring string len MEMORY_FILE
+savepos offset1
+get size2 long
+getdstring dummy size2
+get dummy long
+else
+get size2 long
+getdstring dummy size2
+get dummy long
+endif
+#set q ? ?
+next n
+next i
+xmath dsize "asize - offset1"
+append
+log MEMORY_FILE offset1 dsize
+append
+get size asize MEMORY_FILE
+comtype zlib_compress
+clog MEMORY_FILE2 0 size size MEMORY_FILE
+get zsize asize MEMORY_FILE2
+goto 8 MEMORY_FILE3
+put size long MEMORY_FILE3
+put zsize long MEMORY_FILE3
+append
+log MEMORY_FILE3 0 zsize MEMORY_FILE2
+append
+get size asize MEMORY_FILE3
+log name2 0 size MEMORY_FILE3

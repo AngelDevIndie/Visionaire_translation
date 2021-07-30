@@ -1,0 +1,36 @@
+goto 8
+get name basename
+string name += .dat
+get size long
+get zsize long
+clog name 16 zsize size
+open FDSE name
+log MEMORY_FILE 0 0
+get name basename
+string name += .txt
+
+#BUSCAMOS EL PRIMER ID
+Findloc OFFSET_ID String "Id: "
+Math OFFSET_ID - 8
+goto OFFSET_ID
+
+get files long
+for i = 1 to files
+get size long
+getdstring string size
+getdstring dummy 12
+get number long
+for n = 1 to number
+get size long
+getdstring string size
+get size2 long
+getdstring dummy size2
+get dummy long
+if size > 0
+putdstring string size MEMORY_FILE
+put 0x0a0d short MEMORY_FILE
+endif
+next n
+next i
+get size asize MEMORY_FILE
+log name 0 size MEMORY_FILE
